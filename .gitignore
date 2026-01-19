@@ -1,0 +1,31 @@
+# Virtual environments
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Executables and libraries
+*.exe
+*.dll
+*.so
+
+# Node modules
+node_modules/
+
+# Large model files
+*.pth
+*.bin
+*.onnx
+*.pb
+*.pt
+*.h5
+
+# Data files
+*.zip
+*.tar
+*.gz
+*.env 
+

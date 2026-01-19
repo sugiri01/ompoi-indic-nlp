@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perplexity Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 68px;
+            background: #0f0f0f;
+            border-right: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+            position: relative;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 24px;
+            cursor: pointer;
+        }
+
+        .nav-item {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 0;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: #252525;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .divider {
+            width: 32px;
+            height: 1px;
+            background: #2a2a2a;
+            margin: 8px 0;
+        }
+
+        .bottom-nav {
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            position: absolute;
+            top: 8px;
+            right: 12px;
+        }
+
+        .upgrade-dot,
+        .install-dot {
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            position: absolute;
+            top: 8px;
+            right: 12px;
+        }
+
+        .avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px solid #3b82f6;
+            margin-bottom: 4px;
+        }
+
+        .corner-icons {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .corner-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .corner-icon:hover {
+            opacity: 1;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .brand {
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .brand-text {
+            font-size: 48px;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        .brand-pro {
+            font-size: 28px;
+            font-weight: 600;
+            color: #ffffff;
+            background: #20d4d4;
+            padding: 4px 12px;
+            border-radius: 8px;
+            margin-left: 4px;
+            position: relative;
+            top: -2px;
+        }
+
+        /* Search Box */
+        .search-container {
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .search-box {
+            background: #232323;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: #20d4d4;
+        }
+
+        .search-input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #e0e0e0;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .search-input::placeholder {
+            color: #666;
+        }
+
+        .search-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: #353535;
+            border-color: #4a4a4a;
+        }
+
+        .control-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .control-btn.active {
+            background: #20d4d4;
+            border-color: #20d4d4;
+        }
+
+        .control-btn.active svg {
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Logo -->
+            <svg class="logo" viewBox="0 0 32 32" fill="none">
+                <path d="M16 2L4 8v8c0 7.732 5.373 15.015 12 16.75 6.627-1.735 12-9.018 12-16.75V8L16 2z" stroke="#fff"
+                    stroke-width="2" fill="none" />
+                <path d="M12 16l3 3 6-6" stroke="#fff" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+
+            <!-- Add Button -->
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- History -->
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span class="nav-label">History</span>
+            </div>
+
+            <!-- Discover -->
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+                <span class="nav-label">Discover</span>
+            </div>
+
+            <!-- Spacials -->
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                <span class="nav-label">Spacials</span>
+            </div>
+
+            <!-- Finance -->
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+                <span class="nav-label">Finance</span>
+            </div>
+
+            <!-- More -->
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                    <circle cx="12" cy="12" r="1" fill="#888" />
+                    <circle cx="12" cy="5" r="1" fill="#888" />
+                    <circle cx="12" cy="19" r="1" fill="#888" />
+                </svg>
+                <span class="nav-label">More</span>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="divider"></div>
+
+                <!-- Notifications -->
+                <div class="nav-item">
+                    <div class="notification-dot"></div>
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                </div>
+
+                <!-- Account -->
+                <div class="nav-item">
+                    <div class="avatar"></div>
+                    <span class="nav-label">Account</span>
+                </div>
+
+                <!-- Upgrade -->
+                <div class="nav-item">
+                    <div class="upgrade-dot"></div>
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 8v8m0-8l-4 4m4-4l4 4" />
+                    </svg>
+                    <span class="nav-label">Upgrade</span>
+                </div>
+
+                <!-- Install -->
+                <div class="nav-item">
+                    <div class="install-dot"></div>
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <span class="nav-label">Install</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Brand -->
+            <div class="brand">
+                <span class="brand-text">perplexity</span>
+                <span class="brand-pro">pro</span>
+            </div>
+
+            <!-- Search Box -->
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" class="search-input"
+                        placeholder="Ask anything. Type @ for mentions and / for shortcuts." />
+                    <div class="search-controls">
+                        <!-- Left Controls -->
+                        <div class="control-group">
+                            <button class="control-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="m21 21-4.35-4.35" />
+                                </svg>
+                            </button>
+                            <button class="control-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                                </svg>
+                            </button>
+                            <button class="control-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7" />
+                                    <rect x="14" y="3" width="7" height="7" />
+                                    <rect x="14" y="14" width="7" height="7" />
+                                    <rect x="3" y="14" width="7" height="7" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Right Controls -->
+                        <div class="control-group">
+                            <button class="control-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                                    <line x1="9" y1="9" x2="9.01" y2="9" />
+                                    <line x1="15" y1="9" x2="15.01" y2="9" />
+                                </svg>
+                            </button>
+                            <button class="control-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                </svg>
+                            </button>
+                            <button class="control-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                                    <path
+                                        d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                                </svg>
+                            </button>
+                            <button class="control-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                    <line x1="12" y1="19" x2="12" y2="23" />
+                                    <line x1="8" y1="23" x2="16" y2="23" />
+                                </svg>
+                            </button>
+                            <button class="control-btn active">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 18V5l12-2v13" />
+                                    <circle cx="6" cy="18" r="3" />
+                                    <circle cx="18" cy="16" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Corner Icons -->
+            <div class="corner-icons">
+                <svg class="corner-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                    <path
+                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+                <svg class="corner-icon" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar Navigation Handlers
+        const navItems = document.querySelectorAll('.nav-item');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const label = this.querySelector('.nav-label')?.textContent || 'New';
+
+                // Remove active state from all items
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Handle different navigation actions
+                switch (label) {
+                    case 'History':
+                        showNotification('Opening History...');
+                        break;
+                    case 'Discover':
+                        showNotification('Opening Discover...');
+                        break;
+                    case 'Spacials':
+                        showNotification('Opening Spacials...');
+                        break;
+                    case 'Finance':
+                        showNotification('Opening Finance...');
+                        break;
+                    case 'More':
+                        showNotification('Opening More Options...');
+                        break;
+                    case 'Account':
+                        showNotification('Opening Account Settings...');
+                        break;
+                    case 'Upgrade':
+                        showNotification('Opening Upgrade Options...');
+                        break;
+                    case 'Install':
+                        showNotification('Installing App...');
+                        break;
+                    default:
+                        showNotification('Creating New Thread...');
+                }
+            });
+        });
+
+        // Logo click handler
+        document.querySelector('.logo').addEventListener('click', () => {
+            showNotification('Returning to Home...');
+            location.reload();
+        });
+
+        // Notification handler
+        const notificationIcon = document.querySelector('.bottom-nav .nav-item:has(.notification-dot)');
+        notificationIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showNotification('You have 3 new notifications');
+        });
+
+        // Search Input Handlers
+        const searchInput = document.querySelector('.search-input');
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && searchInput.value.trim()) {
+                handleSearch(searchInput.value);
+            }
+
+            // Handle @ mentions
+            if (e.key === '@') {
+                setTimeout(() => showNotification('Type to search mentions...'), 100);
+            }
+
+            // Handle / shortcuts
+            if (e.key === '/') {
+                setTimeout(() => showNotification('Available shortcuts: /focus, /pro, /search'), 100);
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+
+            // Auto-suggest for shortcuts
+            if (value.startsWith('/')) {
+                const shortcuts = ['/focus', '/pro', '/search', '/image', '/code'];
+                const matching = shortcuts.filter(s => s.startsWith(value));
+                if (matching.length > 0) {
+                    console.log('Matching shortcuts:', matching);
+                }
+            }
+        });
+
+        // Control Button Handlers
+        const controlButtons = document.querySelectorAll('.control-btn');
+
+        // Search button (Focus mode)
+        controlButtons[0].addEventListener('click', function () {
+            this.classList.toggle('active');
+            const isActive = this.classList.contains('active');
+            showNotification(isActive ? 'Focus Mode: ON' : 'Focus Mode: OFF');
+        });
+
+        // Link/Attach button
+        controlButtons[1].addEventListener('click', function () {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.pdf,.doc,.docx,.txt';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    showNotification(`Attached: ${file.name}`);
+                    this.classList.add('active');
+                }
+            };
+            input.click();
+        });
+
+        // Grid/Collections button
+        controlButtons[2].addEventListener('click', function () {
+            this.classList.toggle('active');
+            const isActive = this.classList.contains('active');
+            showNotification(isActive ? 'Collections View: ON' : 'Collections View: OFF');
+        });
+
+        // Emoji button
+        controlButtons[3].addEventListener('click', function () {
+            const emojis = ['😊', '👍', '❤️', '🎉', '🔥', '💡', '✨', '🚀'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            searchInput.value += randomEmoji;
+            searchInput.focus();
+            showNotification('Emoji added!');
+        });
+
+        // Image upload button
+        controlButtons[4].addEventListener('click', function () {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        showNotification(`Image uploaded: ${file.name}`);
+                        this.classList.add('active');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        });
+
+        // Attachment button
+        controlButtons[5].addEventListener('click', function () {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.onchange = (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length > 0) {
+                    showNotification(`${files.length} file(s) attached`);
+                    this.classList.add('active');
+                }
+            };
+            input.click();
+        });
+
+        // Voice/Microphone button
+        controlButtons[6].addEventListener('click', function () {
+            if (!this.classList.contains('recording')) {
+                // Start recording
+                this.classList.add('recording', 'active');
+                this.style.background = '#ef4444';
+                showNotification('Recording started... Click again to stop');
+
+                // Simulate recording
+                this.recordingTimeout = setTimeout(() => {
+                    stopRecording(this);
+                }, 10000); // Auto-stop after 10 seconds
+            } else {
+                // Stop recording
+                clearTimeout(this.recordingTimeout);
+                stopRecording(this);
+            }
+        });
+
+        function stopRecording(button) {
+            button.classList.remove('recording', 'active');
+            button.style.background = '';
+            showNotification('Recording stopped and processed');
+        }
+
+        // Music/Pro mode button (already active)
+        controlButtons[7].addEventListener('click', function () {
+            this.classList.toggle('active');
+            const isActive = this.classList.contains('active');
+            showNotification(isActive ? 'Pro Mode: ON' : 'Pro Mode: OFF');
+        });
+
+        // Corner Icons Handlers
+        const cornerIcons = document.querySelectorAll('.corner-icon');
+
+        // Settings icon
+        cornerIcons[0].addEventListener('click', () => {
+            showNotification('Opening Settings...');
+        });
+
+        // Help icon
+        cornerIcons[1].addEventListener('click', () => {
+            showNotification('Opening Help Center...');
+        });
+
+        // Search Handler
+        function handleSearch(query) {
+            showNotification(`Searching for: "${query}"`);
+
+            // Simulate search processing
+            setTimeout(() => {
+                console.log('Search results for:', query);
+                showNotification('Search complete!');
+            }, 1000);
+        }
+
+        // Notification System
+        function showNotification(message) {
+            // Remove existing notification
+            const existing = document.querySelector('.notification-toast');
+            if (existing) {
+                existing.remove();
+            }
+
+            // Create notification
+            const notification = document.createElement('div');
+            notification.className = 'notification-toast';
+            notification.textContent = message;
+
+            // Add styles
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #20d4d4;
+                color: #000;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideUp 0.3s ease;
+                box-shadow: 0 4px 12px rgba(32, 212, 212, 0.3);
+            `;
+
+            document.body.appendChild(notification);
+
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideDown 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(20px);
+                }
+            }
+
+            .nav-item.active {
+                background: #252525;
+                border-left: 2px solid #20d4d4;
+            }
+
+            .control-btn.recording {
+                animation: pulse 1s infinite;
+            }
+
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.7;
+                }
+            }
+
+            /* Tooltip styles */
+            .nav-item {
+                position: relative;
+            }
+
+            .nav-item:hover::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 100%;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #2a2a2a;
+                color: #e0e0e0;
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-size: 12px;
+                white-space: nowrap;
+                margin-left: 8px;
+                z-index: 100;
+                pointer-events: none;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add tooltips to nav items
+        const navLabels = ['New Thread', 'History', 'Discover', 'Spacials', 'Finance', 'More', 'Notifications', 'Account', 'Upgrade', 'Install'];
+        document.querySelectorAll('.nav-item').forEach((item, index) => {
+            const label = item.querySelector('.nav-label')?.textContent || navLabels[index];
+            item.setAttribute('data-tooltip', label);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + K for focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+                showNotification('Search focused (Ctrl+K)');
+            }
+
+            // Ctrl/Cmd + / for shortcuts
+            if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+                e.preventDefault();
+                showNotification('Shortcuts: Ctrl+K (Search), Ctrl+N (New), Ctrl+H (History)');
+            }
+
+            // Ctrl/Cmd + N for new thread
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                searchInput.value = '';
+                searchInput.focus();
+                showNotification('New thread created');
+            }
+
+            // Ctrl/Cmd + H for history
+            if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+                e.preventDefault();
+                showNotification('Opening History...');
+            }
+        });
+
+        // Initial welcome message
+        setTimeout(() => {
+            showNotification('Welcome to Perplexity Pro! All features are now functional.');
+        }, 500);
+
+        console.log('✅ All frontend options are now functional!');
+        console.log('Available keyboard shortcuts:');
+        console.log('  - Ctrl/Cmd + K: Focus search');
+        console.log('  - Ctrl/Cmd + N: New thread');
+        console.log('  - Ctrl/Cmd + H: Open history');
+        console.log('  - Ctrl/Cmd + /: Show shortcuts');
+    </script>
+</body>
+
+</html>

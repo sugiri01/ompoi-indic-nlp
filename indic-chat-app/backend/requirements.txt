@@ -1,0 +1,11 @@
+
+fastapi
+uvicorn
+deep-translator
+python-multipart
+requests
+groq>=0.4.0
+openai-whisper
+gTTS
+pydub
+imageio-ffmpeg
